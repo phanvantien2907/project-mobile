@@ -1,11 +1,15 @@
 import { Tabs } from "expo-router";
+<<<<<<< HEAD
 import { House } from "lucide-react-native";
+=======
+>>>>>>> 03c3663 (update 08/03/2026)
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+<<<<<<< HEAD
         tabBarActiveTintColor: "#F47C20",
         tabBarInactiveTintColor: "#C9A387",
         tabBarStyle: {
@@ -27,13 +31,19 @@ export default function TabLayout() {
         sceneStyle: {
           backgroundColor: "#FFF8F2",
         },
+=======
+>>>>>>> 03c3663 (update 08/03/2026)
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+<<<<<<< HEAD
           title: "Trang chủ",
           tabBarIcon: ({ color, size }) => <House color={color} size={size} />,
+=======
+          title: "Home",
+>>>>>>> 03c3663 (update 08/03/2026)
         }}
       />
     </Tabs>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   BellRing,
   ChartColumnBig,
@@ -131,5 +132,16 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
+=======
+import { Text, View } from "react-native";
+
+export default function HomeScreen() {
+  return (
+    <View className="flex-1 items-center justify-center">
+      <Text className="text-lg text-blue-500 font-bold cursor-pointer">
+        Home
+      </Text>
+    </View>
+>>>>>>> 03c3663 (update 08/03/2026)
   );
 }
