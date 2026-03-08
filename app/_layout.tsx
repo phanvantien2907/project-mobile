@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/theme/theme-provider";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "../global.css";
+import "../services/firebase";
 
 export default function RootLayout() {
   return (

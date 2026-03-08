@@ -9,6 +9,11 @@ dist/
 web-build/
 expo-env.d.ts
 
+# expo file
+.expo/
+
+# vs code
+.vscode/
 
 #env
 .env.*
