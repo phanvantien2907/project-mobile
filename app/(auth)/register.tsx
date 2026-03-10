@@ -10,10 +10,36 @@ import {
   TextInput,
   View,
 } from "react-native";
-
 import SocialComponents from "@/components/ui/social";
+import { useState } from "react";
+import { register } from "@/services/authen";
+import Toast from "react-native-toast-message";
+import { handleAuthError } from "@/services/firebase-error";
 
 export default function RegisterScreen() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+  const handleRegister = async () => {
+    try {
+      if(!email || !password || !confirmPassword) {
+        Toast.show({ type: "error", text1: "Vui lòng điền đầy đủ thông tin!" });
+        return;
+      }
+      if (confirmPassword !== password) {
+        Toast.show({ type: "error", text1: "Mật khẩu xác nhận không khớp!" });
+        return;
+      }
+
+      await register(email, password);
+      Toast.show({ type: "success", text1: "Đăng ký thành công!" });
+      router.replace("/(tabs)");
+    } catch (err: unknown) {
+      handleAuthError(err, "Đăng ký thất bại!");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-brand-50">
       <KeyboardAvoidingView
@@ -57,6 +83,8 @@ export default function RegisterScreen() {
                       placeholderTextColor="#B8A99A"
                       keyboardType="email-address"
                       autoCapitalize="none"
+                      value={email}
+                      onChangeText={setEmail}
                     />
                   </View>
                 </View>
@@ -73,6 +101,8 @@ export default function RegisterScreen() {
                       placeholder="Tạo mật khẩu"
                       placeholderTextColor="#B8A99A"
                       secureTextEntry
+                      value={password}
+                      onChangeText={setPassword}
                     />
                   </View>
                 </View>
@@ -89,6 +119,8 @@ export default function RegisterScreen() {
                       placeholder="Nhập lại mật khẩu"
                       placeholderTextColor="#B8A99A"
                       secureTextEntry
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
                     />
                   </View>
                 </View>
@@ -96,7 +128,7 @@ export default function RegisterScreen() {
                 {/* Submit */}
                 <Pressable
                   className="mt-1 h-14 items-center justify-center rounded-xl bg-brand-500"
-                  onPress={() => router.replace("/(tabs)")}
+                  onPress={handleRegister}
                 >
                   <Text className="text-base font-bold text-white">
                     Tạo tài khoản

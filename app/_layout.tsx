@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "../global.css";
 import "../services/firebase";
+import AppToast from "@/components/ui/app-toast";
 
 export default function RootLayout() {
   return (
@@ -11,6 +12,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <AppToast />
       <StatusBar style="auto" />
     </ThemeProvider>
   );

@@ -10,10 +10,30 @@ import {
   TextInput,
   View,
 } from "react-native";
-
 import SocialComponents from "@/components/ui/social";
+import { useState } from "react";
+import { login } from "@/services/authen";
+import Toast from "react-native-toast-message";
+import { handleAuthError } from "@/services/firebase-error";
 
 export default function LoginScreen() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Toast.show({ type: "error", text1: "Vui lòng điền đầy đủ thông tin!" });
+      return;
+    }
+    try {
+      await login(email, password);
+      Toast.show({ type: "success", text1: "Đăng nhập thành công!" });
+      router.replace("/(tabs)");
+    } catch (err: unknown) {
+      handleAuthError(err, "Đăng nhập thất bại!");
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-brand-50">
       <KeyboardAvoidingView
@@ -53,10 +73,12 @@ export default function LoginScreen() {
                     <Mail color="#D96A15" size={18} />
                     <TextInput
                       className="flex-1 text-sm text-brand-900"
-                      placeholder="admin@company.com"
+                      placeholder="admin@dhv.com"
                       placeholderTextColor="#B8A99A"
                       keyboardType="email-address"
                       autoCapitalize="none"
+                      value={email}
+                      onChangeText={setEmail}
                     />
                   </View>
                 </View>
@@ -80,6 +102,8 @@ export default function LoginScreen() {
                       placeholder="Nhập mật khẩu"
                       placeholderTextColor="#B8A99A"
                       secureTextEntry
+                      value={password}
+                      onChangeText={setPassword}
                     />
                   </View>
                 </View>
@@ -87,7 +111,7 @@ export default function LoginScreen() {
                 {/* Submit */}
                 <Pressable
                   className="mt-1 h-14 items-center justify-center rounded-xl bg-brand-500"
-                  onPress={() => router.replace("/(tabs)")}
+                  onPress={handleLogin}
                 >
                   <Text className="text-base font-bold text-white">
                     Đăng nhập
