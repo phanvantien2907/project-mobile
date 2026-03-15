@@ -1,7 +1,7 @@
 import { db } from "@/services/firebase";
-import { addDoc, collection, getDocs, Timestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, Timestamp, updateDoc } from "firebase/firestore";
 
-export interface Department {
+export interface IDepartment {
     id: string;
     name: string;
     createdAt: Date;
@@ -10,7 +10,7 @@ export interface Department {
     deletedAt?: Date | null;
 }
 
-export async function createDepartment(data: Department) {
+export async function createDepartment(data: IDepartment) {
     const dbData = {
         ...data,
         createdAt: Timestamp.now(),
@@ -22,5 +22,27 @@ export async function createDepartment(data: Department) {
 
 export async function getDepartments() {
     const dpm = await getDocs(collection(db, "departments"));
-    return dpm.docs.map(item => item.data() as Department);
+    return dpm.docs.map(item => item.data() as IDepartment);
+}
+
+export async function updateDepartment(id: string, data: IDepartment) {
+    const dbData = {
+        ...data,
+        updatedAt: Timestamp.now(),
+    }
+    return await updateDoc(doc(db, "departments", id), dbData);
+}
+
+export async function deleteDepartment(id: string) {
+    return await updateDoc(doc(db, "departments", id), {
+        deletedAt: Timestamp.now(),
+        isActive: false
+    });
+}
+
+export async function restoreDepartment(id: string) {
+    return await updateDoc(doc(db, "departments", id), {
+        deletedAt: null,
+        isActive: true
+    });
 }
