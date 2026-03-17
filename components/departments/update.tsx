@@ -2,9 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import {
-  createDepartment,
-} from "@/services/departments";
+import { IDepartment, updateDepartment } from "@/services/departments";
 import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -16,25 +14,27 @@ import {
 import Toast from "react-native-toast-message";
 import { Building2, X } from "lucide-react-native";
 
-interface CreateDepartmentProps {
+interface UpdateDepartmentProps {
   visible: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData: IDepartment | null;
 }
 
-export default function CreateDepartmentComponent({
+export default function UpdateDepartmentComponent({
   visible,
   onClose,
   onSuccess,
-}: CreateDepartmentProps) {
+  initialData,
+}: UpdateDepartmentProps) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (visible) {
-      setName("");
+    if (visible && initialData) {
+      setName(initialData.name);
     }
-  }, [visible]);
+  }, [visible, initialData]);
 
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -46,19 +46,18 @@ export default function CreateDepartmentComponent({
       return;
     }
 
+    if (!initialData) return;
+
     try {
       setLoading(true);
-      await createDepartment({
-        id: "",
+      await updateDepartment(initialData.id, {
+        ...initialData,
         name: name.trim(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isActive: true,
       });
       Toast.show({
         type: "success",
         text1: "Thành công",
-        text2: "Thêm phòng ban thành công",
+        text2: "Cập nhật phòng ban thành công",
       });
       onSuccess();
       onClose();
@@ -88,7 +87,7 @@ export default function CreateDepartmentComponent({
         <View className="rounded-3xl bg-brand-50 p-6 shadow-xl">
           <View className="mb-6 flex-row items-center justify-between">
             <Text variant="title" className="text-brand-900">
-              Thêm phòng ban mới
+              Cập nhật phòng ban
             </Text>
             <Pressable
               onPress={onClose}
@@ -114,17 +113,17 @@ export default function CreateDepartmentComponent({
               variant="secondary"
               onPress={onClose}
               disabled={loading}
-              className="flex-1 bg-[#FFEEDD] rounded-full"
+              className="flex-1 rounded-full bg-[#FFEEDD]"
               textStyle={{ color: "#D96A15" }}
             >
               Hủy
             </Button>
             <Button
               onPress={handleSubmit}
-              className="flex-1 bg-brand-500 rounded-full"
+              className="flex-1 cursor-pointer rounded-full bg-brand-500"
               loading={loading}
             >
-              Thêm mới
+              Cập nhật
             </Button>
           </View>
         </View>

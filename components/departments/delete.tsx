@@ -1,0 +1,83 @@
+import React from "react";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  View,
+} from "react-native";
+import { Text } from "@/components/ui/text";
+import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
+import { X, Trash2 } from "lucide-react-native";
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  name?: string;
+}
+
+export default function DeleteDepartmentComponent({
+  visible,
+  onClose,
+  onConfirm,
+  name,
+}: Props) {
+  return (
+    <Modal visible={visible} transparent animationType="fade">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1 justify-center bg-black/50 p-5"
+      >
+        <Pressable
+          className="absolute bottom-0 left-0 right-0 top-0"
+          onPress={onClose}
+        />
+
+        <View className="rounded-3xl bg-brand-50 p-6 shadow-xl">
+          <View className="mb-6 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-3">
+              <View className="h-10 w-10 items-center justify-center rounded-full bg-[#FFF0EE]">
+                <Icon name={Trash2} size={20} color="#E74C3C" />
+              </View>
+              <Text variant="title" className="text-brand-900">
+                Xóa phòng ban
+              </Text>
+            </View>
+            <Pressable
+              onPress={onClose}
+              className="h-8 w-8 items-center justify-center rounded-full bg-brand-100"
+            >
+              <Icon name={X} size={18} color="#D96A15" />
+            </Pressable>
+          </View>
+
+          <View className="mb-6">
+            <Text className="text-base text-neutral-600">
+              Bạn có chắc chắn muốn xóa phòng ban{" "}
+              <Text className="font-semibold text-brand-900">{name}</Text> này?
+            </Text>
+          </View>
+
+          <View className="flex-row gap-3">
+            <Button
+              variant="secondary"
+              onPress={onClose}
+              className="flex-1 bg-[#FFEEDD] rounded-full"
+              textStyle={{ color: "#D96A15" }}
+            >
+              Hủy
+            </Button>
+            <Button
+              onPress={onConfirm}
+              className="flex-1 rounded-full bg-[#E74C3C]"
+            >
+              Đồng ý
+            </Button>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
