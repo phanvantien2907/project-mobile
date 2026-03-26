@@ -10,25 +10,26 @@ import {
 import { useFocusEffect } from "expo-router";
 import Toast from "react-native-toast-message";
 import {
-  Building2,
   Pencil,
   Plus,
   Trash2,
   MoreVertical,
+  GraduationCap,
+  User,
   RefreshCcw,
 } from "lucide-react-native";
 
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import CreateCourse from "@/components/courses/create";
-import UpdateCourse from "@/components/courses/update";
-import DetailCourse from "@/components/courses/detail";
-import DeleteCourse from "@/components/courses/delete";
-import { deleteCourse, restoreCourse, getCourses, ICourse } from "@/services/courses";
+import CreateStudent from "@/components/students/create";
+import UpdateStudent from "@/components/students/update";
+import DetailStudent from "@/components/students/detail";
+import DeleteStudent from "@/components/students/delete";
+import { deleteStudent, restoreStudent, getStudents, IStudent } from "@/services/students";
 
-export default function CoursesScreen() {
-  const [courses, setCourses] = useState<ICourse[]>([]);
+export default function StudentsScreen() {
+  const [students, setStudents] = useState<IStudent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -36,18 +37,18 @@ export default function CoursesScreen() {
   const [modal, setModal] = useState<
     "" | "create" | "update" | "detail" | "delete" | "action" | "restore"
   >("");
-  const [selected, setSelected] = useState<ICourse | null>(null);
+  const [selected, setSelected] = useState<IStudent | null>(null);
 
-  const fetchCourses = useCallback(async () => {
+  const fetchStudents = useCallback(async () => {
     try {
-      const data = await getCourses();
-      setCourses(data);
+      const data = await getStudents();
+      setStudents(data);
     } catch (error) {
       console.error(error);
       Toast.show({
         type: "error",
         text1: "Lỗi",
-        text2: "Không thể tải danh sách khóa học",
+        text2: "Không thể tải danh sách sinh viên",
       });
     } finally {
       setLoading(false);
@@ -58,31 +59,31 @@ export default function CoursesScreen() {
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
-      fetchCourses();
-    }, [fetchCourses]),
+      fetchStudents();
+    }, [fetchStudents]),
   );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    fetchCourses();
-  }, [fetchCourses]);
+    fetchStudents();
+  }, [fetchStudents]);
 
   const confirmDelete = async () => {
     if (!selected?.id) return;
     try {
-      await deleteCourse(selected.id);
+      await deleteStudent(selected.id);
       Toast.show({
         type: "success",
         text1: "Thành công",
-        text2: "Đã xóa khóa học",
+        text2: "Đã xóa sinh viên",
       });
-      fetchCourses();
+      fetchStudents();
     } catch (error) {
       console.error(error);
       Toast.show({
         type: "error",
         text1: "Lỗi",
-        text2: "Không thể xóa khóa học",
+        text2: "Không thể xóa sinh viên",
       });
     } finally {
       setModal("");
@@ -93,19 +94,19 @@ export default function CoursesScreen() {
   const confirmRestore = async () => {
     if (!selected?.id) return;
     try {
-      await restoreCourse(selected.id);
+      await restoreStudent(selected.id);
       Toast.show({
         type: "success",
         text1: "Thành công",
-        text2: "Đã khôi phục khóa học",
+        text2: "Đã khôi phục sinh viên",
       });
-      fetchCourses();
+      fetchStudents();
     } catch (error) {
       console.error(error);
       Toast.show({
         type: "error",
         text1: "Lỗi",
-        text2: "Không thể khôi phục khóa học",
+        text2: "Không thể khôi phục sinh viên",
       });
     } finally {
       setModal("");
@@ -117,7 +118,7 @@ export default function CoursesScreen() {
     const base = [
       {
         label: "Xem chi tiết",
-        icon: Building2,
+        icon: User,
         key: "detail",
         color: "#18A957",
         bg: "#E8F8F0",
@@ -135,7 +136,7 @@ export default function CoursesScreen() {
           bg: "#EFF4FF",
         },
         {
-          label: "Xóa khóa học",
+          label: "Xóa sinh viên",
           icon: Trash2,
           key: "delete",
           color: "#E74C3C",
@@ -156,11 +157,11 @@ export default function CoursesScreen() {
     ];
   };
 
-  const renderItem = ({ item }: { item: ICourse }) => (
+  const renderItem = ({ item }: { item: IStudent }) => (
     <View className="mb-3 flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm border border-neutral-100">
       <View className="flex-1 flex-row items-center gap-3">
         <View className="h-10 w-10 items-center justify-center rounded-full bg-brand-50">
-          <Icon name={Building2} size={20} color="#F47C20" />
+          <Icon name={GraduationCap} size={20} color="#F47C20" />
         </View>
         <View className="flex-1">
           <Text
@@ -168,7 +169,10 @@ export default function CoursesScreen() {
             className="text-neutral-900 font-semibold"
             numberOfLines={1}
           >
-            {item.course_name}
+            {item.student_name}
+          </Text>
+          <Text variant="caption" className="text-neutral-500 mb-1">
+             Mã SV: {item.student_code}
           </Text>
           <View
             className={`mt-1.5 self-start px-4 py-1.5 rounded-full ${
@@ -181,7 +185,7 @@ export default function CoursesScreen() {
                 item.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
               }`}
             >
-              {item.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
+              {item.isActive ? "Đang học" : "Đã nghỉ học"}
             </Text>
           </View>
         </View>
@@ -206,7 +210,7 @@ export default function CoursesScreen() {
       <View className="flex-1 px-5 pt-14 pb-28">
         <View className="mb-6 flex-row items-center justify-between">
           <Text variant="heading" className="text-brand-900">
-            Khóa học
+            Sinh viên
           </Text>
           <Button
             size="sm"
@@ -222,7 +226,7 @@ export default function CoursesScreen() {
         </View>
 
         <FlatList
-          data={courses}
+          data={students}
           keyExtractor={(item, index) => item.id || index.toString()}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
@@ -238,16 +242,16 @@ export default function CoursesScreen() {
             !loading ? (
               <View className="mt-20 items-center justify-center">
                 <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-100">
-                  <Icon name={Building2} size={32} color="#F47C20" />
+                  <Icon name={GraduationCap} size={32} color="#F47C20" />
                 </View>
                 <Text variant="title" className="text-center text-neutral-900">
-                  Chưa có khóa học nào
+                  Chưa có sinh viên nào
                 </Text>
                 <Text
                   variant="caption"
                   className="mt-2 text-center text-neutral-500"
                 >
-                  Bấm "Thêm mới" để tạo khóa học đầu tiên
+                  Bấm "Thêm mới" để tạo sinh viên đầu tiên
                 </Text>
               </View>
             ) : null
@@ -297,34 +301,34 @@ export default function CoursesScreen() {
         </Pressable>
       </Modal>
 
-      <CreateCourse
+      <CreateStudent
         visible={modal === "create"}
         onClose={() => setModal("")}
-        onSuccess={fetchCourses}
+        onSuccess={fetchStudents}
       />
-      <DetailCourse
+      <DetailStudent
         visible={modal === "detail"}
         onClose={() => setModal("")}
-        course={selected}
+        student={selected}
       />
-      <UpdateCourse
+      <UpdateStudent
         visible={modal === "update"}
         onClose={() => setModal("")}
-        onSuccess={fetchCourses}
+        onSuccess={fetchStudents}
         initialData={selected}
       />
-      <DeleteCourse
+      <DeleteStudent
         visible={modal === "delete"}
         onClose={() => setModal("")}
         onConfirm={confirmDelete}
-        name={selected?.course_name}
+        name={selected?.student_name}
       />
-      <DeleteCourse
+      <DeleteStudent
         isRestore
         visible={modal === "restore"}
         onClose={() => setModal("")}
         onConfirm={confirmRestore}
-        name={selected?.course_name}
+        name={selected?.student_name}
       />
     </SafeAreaView>
   );

@@ -9,11 +9,12 @@ import {
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { X, Trash2 } from "lucide-react-native";
+import { X, Trash2, RefreshCcw } from "lucide-react-native";
 import { BaseDialogProps } from "@/types/dialog";
 
 interface Props extends BaseDialogProps {
   name?: string;
+  isRestore?: boolean;
 }
 
 export default function DeleteCourse({
@@ -21,6 +22,7 @@ export default function DeleteCourse({
   onClose,
   onConfirm,
   name,
+  isRestore,
 }: Props) {
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -36,11 +38,11 @@ export default function DeleteCourse({
         <View className="rounded-3xl bg-brand-50 p-6 shadow-xl">
           <View className="mb-6 flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-full bg-[#FFF0EE]">
-                <Icon name={Trash2} size={20} color="#E74C3C" />
+              <View className={`h-10 w-10 items-center justify-center rounded-full ${isRestore ? "bg-[#E8F8F0]" : "bg-[#FFF0EE]"}`}>
+                <Icon name={isRestore ? RefreshCcw : Trash2} size={20} color={isRestore ? "#18A957" : "#E74C3C"} />
               </View>
               <Text variant="title" className="text-brand-900">
-                Xóa khóa học
+                {isRestore ? "Khôi phục khóa học" : "Xóa khóa học"}
               </Text>
             </View>
             <Pressable
@@ -53,7 +55,7 @@ export default function DeleteCourse({
 
           <View className="mb-6">
             <Text className="text-base text-neutral-600">
-              Bạn có chắc chắn muốn xóa khóa học{" "}
+              Bạn có chắc chắn muốn {isRestore ? "khôi phục" : "xóa"} khóa học{" "}
               <Text className="font-semibold text-brand-900">{name}</Text> này?
             </Text>
           </View>
@@ -69,9 +71,9 @@ export default function DeleteCourse({
             </Button>
             <Button
               onPress={onConfirm}
-              className="flex-1 rounded-full bg-[#E74C3C]"
+              className={`flex-1 rounded-full ${isRestore ? "bg-[#18A957]" : "bg-[#E74C3C]"}`}
             >
-              Đồng ý
+              {isRestore ? "Khôi phục" : "Đồng ý"}
             </Button>
           </View>
         </View>

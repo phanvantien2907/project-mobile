@@ -57,3 +57,10 @@ export async function deleteCourse(id: string) {
         isActive: false,
     });
 }
+
+export async function restoreCourse(id: string) {
+    return await updateDoc(doc(db, "courses", id), {
+        deletedAt: null,
+        isActive: true,
+    });
+}

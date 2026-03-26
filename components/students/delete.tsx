@@ -17,7 +17,7 @@ interface Props extends BaseDialogProps {
   isRestore?: boolean;
 }
 
-export default function DeleteDepartmentComponent({
+export default function DeleteStudent({
   visible,
   onClose,
   onConfirm,
@@ -42,7 +42,7 @@ export default function DeleteDepartmentComponent({
                 <Icon name={isRestore ? RefreshCcw : Trash2} size={20} color={isRestore ? "#18A957" : "#E74C3C"} />
               </View>
               <Text variant="title" className="text-brand-900">
-                {isRestore ? "Khôi phục phòng ban" : "Xóa phòng ban"}
+                {isRestore ? "Khôi phục sinh viên" : "Xóa sinh viên"}
               </Text>
             </View>
             <Pressable
@@ -55,7 +55,7 @@ export default function DeleteDepartmentComponent({
 
           <View className="mb-6">
             <Text className="text-base text-neutral-600">
-              Bạn có chắc chắn muốn {isRestore ? "khôi phục" : "xóa"} phòng ban{" "}
+              Bạn có chắc chắn muốn {isRestore ? "khôi phục" : "xóa"} sinh viên{" "}
               <Text className="font-semibold text-brand-900">{name}</Text> này?
             </Text>
           </View>

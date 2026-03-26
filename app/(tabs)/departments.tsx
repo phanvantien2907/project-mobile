@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import {
   deleteDepartment,
+  restoreDepartment,
   getDepartments,
   IDepartment,
 } from "@/services/departments";
@@ -13,7 +14,7 @@ import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { Alert, FlatList, Modal, Pressable, SafeAreaView, View } from "react-native";
 import Toast from "react-native-toast-message";
-import { Building2, Pencil, Plus, Trash2, MoreVertical } from "lucide-react-native";
+import { Building2, Pencil, Plus, Trash2, MoreVertical, RefreshCcw } from "lucide-react-native";
 import DeleteDepartmentComponent from "@/components/departments/delete";
 
 export default function DepartmentsScreen() {
@@ -24,6 +25,7 @@ export default function DepartmentsScreen() {
   const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
   const [selectedDept, setSelectedDept] = useState<IDepartment | null>(null);
   const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
+  const [restoreModalVisible, setRestoreModalVisible] = useState<boolean>(false);
   const [deptToDelete, setDeptToDelete] = useState<IDepartment | null>(null);
   const [actionModalVisible, setActionModalVisible] = useState<boolean>(false);
 
@@ -70,6 +72,28 @@ export default function DepartmentsScreen() {
     } finally {
       setDeleteModalVisible(false);
       setDeptToDelete(null);
+    }
+  };
+
+  const confirmRestore = async () => {
+    if (!selectedDept || !selectedDept.id) return;
+    try {
+      await restoreDepartment(selectedDept.id);
+      Toast.show({
+        type: "success",
+        text1: "Thành công",
+        text2: "Đã khôi phục phòng ban",
+      });
+      fetchDepartments();
+    } catch (error) {
+      console.error(error);
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: "Không thể khôi phục phòng ban",
+      });
+    } finally {
+      setRestoreModalVisible(false);
     }
   };
 
@@ -195,29 +219,44 @@ export default function DepartmentsScreen() {
                 <Text className="font-semibold text-[#18A957]">Xem chi tiết</Text>
               </Pressable>
 
-              <Pressable
-                onPress={() => {
-                  setActionModalVisible(false);
-                  setTimeout(() => setUpdateModalVisible(true), 150);
-                }}
-                className="flex-row items-center gap-3 rounded-2xl bg-[#EFF4FF] p-4"
-              >
-                <Icon name={Pencil} size={20} color="#2667FF" />
-                <Text className="font-semibold text-[#2667FF]">Chỉnh sửa</Text>
-              </Pressable>
+              {selectedDept?.isActive ? (
+                <>
+                  <Pressable
+                    onPress={() => {
+                      setActionModalVisible(false);
+                      setTimeout(() => setUpdateModalVisible(true), 150);
+                    }}
+                    className="flex-row items-center gap-3 rounded-2xl bg-[#EFF4FF] p-4"
+                  >
+                    <Icon name={Pencil} size={20} color="#2667FF" />
+                    <Text className="font-semibold text-[#2667FF]">Chỉnh sửa</Text>
+                  </Pressable>
 
-              <Pressable
-                onPress={() => {
-                  setActionModalVisible(false);
-                  setTimeout(() => {
-                    if (selectedDept) handleDelete(selectedDept);
-                  }, 150);
-                }}
-                className="flex-row items-center gap-3 rounded-2xl bg-[#FFF0EE] p-4"
-              >
-                <Icon name={Trash2} size={20} color="#E74C3C" />
-                <Text className="font-semibold text-[#E74C3C]">Xóa phòng ban</Text>
-              </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setActionModalVisible(false);
+                      setTimeout(() => {
+                        if (selectedDept) handleDelete(selectedDept);
+                      }, 150);
+                    }}
+                    className="flex-row items-center gap-3 rounded-2xl bg-[#FFF0EE] p-4"
+                  >
+                    <Icon name={Trash2} size={20} color="#E74C3C" />
+                    <Text className="font-semibold text-[#E74C3C]">Xóa phòng ban</Text>
+                  </Pressable>
+                </>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    setActionModalVisible(false);
+                    setTimeout(() => setRestoreModalVisible(true), 150);
+                  }}
+                  className="flex-row items-center gap-3 rounded-2xl bg-[#E8F8F0] p-4"
+                >
+                  <Icon name={RefreshCcw} size={20} color="#18A957" />
+                  <Text className="font-semibold text-[#18A957]">Khôi phục phòng ban</Text>
+                </Pressable>
+              )}
             </View>
           </Pressable>
         </Pressable>
@@ -244,6 +283,13 @@ export default function DepartmentsScreen() {
         onClose={() => setDeleteModalVisible(false)}
         onConfirm={confirmDelete}
         name={deptToDelete?.name}
+      />
+      <DeleteDepartmentComponent
+        isRestore
+        visible={restoreModalVisible}
+        onClose={() => setRestoreModalVisible(false)}
+        onConfirm={confirmRestore}
+        name={selectedDept?.name}
       />
     </SafeAreaView>
   );
