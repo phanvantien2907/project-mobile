@@ -51,7 +51,6 @@ export async function getDepartmentById(id: string) {
     where("department_id", "==", id),
     where("isActive", "==", true),
     where("deletedAt", "==", null),
-    orderBy("createdAt", "desc"),
   );
   const snapshot = await getDocs(dpm);
   return snapshot.docs.map(

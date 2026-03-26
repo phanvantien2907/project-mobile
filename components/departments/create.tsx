@@ -2,9 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import {
-  createDepartment,
-} from "@/services/departments";
+import { createDepartment } from "@/services/departments";
 import React, { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -15,20 +13,17 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { Building2, X } from "lucide-react-native";
+import { BaseDialogProps } from "@/types/dialog";
 
-interface CreateDepartmentProps {
-  visible: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-}
+interface Props extends BaseDialogProps {}
 
 export default function CreateDepartmentComponent({
   visible,
   onClose,
   onSuccess,
-}: CreateDepartmentProps) {
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+}: Props) {
+  const [name, setName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible) {
@@ -60,7 +55,7 @@ export default function CreateDepartmentComponent({
         text1: "Thành công",
         text2: "Thêm phòng ban thành công",
       });
-      onSuccess();
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error(error);

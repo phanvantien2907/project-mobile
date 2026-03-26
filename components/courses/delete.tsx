@@ -16,7 +16,7 @@ interface Props extends BaseDialogProps {
   name?: string;
 }
 
-export default function DeleteDepartmentComponent({
+export default function DeleteCourse({
   visible,
   onClose,
   onConfirm,
@@ -40,7 +40,7 @@ export default function DeleteDepartmentComponent({
                 <Icon name={Trash2} size={20} color="#E74C3C" />
               </View>
               <Text variant="title" className="text-brand-900">
-                Xóa phòng ban
+                Xóa khóa học
               </Text>
             </View>
             <Pressable
@@ -53,7 +53,7 @@ export default function DeleteDepartmentComponent({
 
           <View className="mb-6">
             <Text className="text-base text-neutral-600">
-              Bạn có chắc chắn muốn xóa phòng ban{" "}
+              Bạn có chắc chắn muốn xóa khóa học{" "}
               <Text className="font-semibold text-brand-900">{name}</Text> này?
             </Text>
           </View>

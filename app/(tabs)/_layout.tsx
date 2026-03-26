@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Building2, House } from "lucide-react-native";
+import { Building2, House, GraduationCap } from "lucide-react-native";
 
 export default function TabLayout() {
   return (
@@ -45,6 +45,13 @@ export default function TabLayout() {
         options={{
           title: "Phòng ban",
           tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+        }}
+      />
+       <Tabs.Screen
+        name="courses"
+        options={{
+          title: "Khóa học",
+          tabBarIcon: ({ color, size }) => <GraduationCap color={color} size={size} />,
         }}
       />
     </Tabs>

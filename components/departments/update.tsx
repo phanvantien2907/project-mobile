@@ -13,11 +13,9 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { Building2, X } from "lucide-react-native";
+import { BaseDialogProps } from "@/types/dialog";
 
-interface UpdateDepartmentProps {
-  visible: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
+interface Props extends BaseDialogProps {
   initialData: IDepartment | null;
 }
 
@@ -26,9 +24,9 @@ export default function UpdateDepartmentComponent({
   onClose,
   onSuccess,
   initialData,
-}: UpdateDepartmentProps) {
+}: Props) {
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible && initialData) {
@@ -59,7 +57,7 @@ export default function UpdateDepartmentComponent({
         text1: "Thành công",
         text2: "Cập nhật phòng ban thành công",
       });
-      onSuccess();
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error(error);

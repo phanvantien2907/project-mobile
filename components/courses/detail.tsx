@@ -9,21 +9,24 @@ import {
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { IDepartment } from "@/services/departments";
-import { Building2, Calendar, Hash, X } from "lucide-react-native";
+import {
+  Building2,
+  Calendar,
+  Hash,
+  X,
+  GraduationCap,
+  Clock,
+} from "lucide-react-native";
 import dayjs from "dayjs";
+import { ICourse } from "@/services/courses";
 import { BaseDialogProps } from "@/types/dialog";
 
 interface Props extends BaseDialogProps {
-  department: IDepartment | null;
+  course?: ICourse | null;
 }
 
-export default function DetailDepartmentComponent({
-  visible,
-  onClose,
-  department,
-}: Props) {
-  if (!department) return null;
+export default function DetailCourse({ visible, onClose, course }: Props) {
+  if (!course) return null;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -39,7 +42,7 @@ export default function DetailDepartmentComponent({
         <View className="rounded-3xl bg-brand-50 p-6 shadow-xl">
           <View className="mb-6 flex-row items-center justify-between">
             <Text variant="title" className="text-brand-900">
-              Chi tiết phòng ban
+              Chi tiết khóa học
             </Text>
             <Pressable
               onPress={onClose}
@@ -60,20 +63,20 @@ export default function DetailDepartmentComponent({
                   className="text-neutral-900"
                   numberOfLines={2}
                 >
-                  {department.name}
+                  {course.course_name}
                 </Text>
                 <View
                   className={`mt-1.5 self-start px-4 py-1.5 rounded-full ${
-                    department.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
+                    course.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
                   }`}
                 >
                   <Text
                     style={{ lineHeight: 18, includeFontPadding: true }}
                     className={`text-xs font-semibold ${
-                      department.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
+                      course.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
                     }`}
                   >
-                    {department.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
+                    {course.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
                   </Text>
                 </View>
               </View>
@@ -85,9 +88,33 @@ export default function DetailDepartmentComponent({
                   <Icon name={Hash} size={16} color="#737373" />
                 </View>
                 <View className="flex-1">
-                  <Text variant="caption">Mã phòng ban</Text>
+                  <Text variant="caption">Mã môn học</Text>
                   <Text className="font-medium text-neutral-900 mt-0.5">
-                    {department.id}
+                    {course.course_code}
+                  </Text>
+                </View>
+              </View>
+
+              <View className="flex-row items-center gap-3">
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
+                  <Icon name={GraduationCap} size={16} color="#737373" />
+                </View>
+                <View className="flex-1">
+                  <Text variant="caption">Khoa</Text>
+                  <Text className="font-medium text-neutral-900 mt-0.5">
+                    {course.department_name}
+                  </Text>
+                </View>
+              </View>
+
+              <View className="flex-row items-center gap-3">
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
+                  <Icon name={Clock} size={16} color="#737373" />
+                </View>
+                <View className="flex-1">
+                  <Text variant="caption">Số tín chỉ</Text>
+                  <Text className="font-medium text-neutral-900 mt-0.5">
+                    {course.course_credits} TC
                   </Text>
                 </View>
               </View>
@@ -99,33 +126,13 @@ export default function DetailDepartmentComponent({
                 <View className="flex-1">
                   <Text variant="caption">Ngày tạo</Text>
                   <Text className="font-medium text-neutral-900 mt-0.5">
-                    {department.createdAt
+                    {course.createdAt
                       ? dayjs(
                           (
-                            department.createdAt as unknown as {
+                            course.createdAt as unknown as {
                               toDate: () => Date;
                             }
-                          ).toDate?.() || department.createdAt,
-                        ).format("DD/MM/YYYY HH:mm")
-                      : "N/A"}
-                  </Text>
-                </View>
-              </View>
-
-              <View className="flex-row items-center gap-3">
-                <View className="h-8 w-8 items-center justify-center rounded-full bg-neutral-100">
-                  <Icon name={Calendar} size={16} color="#737373" />
-                </View>
-                <View className="flex-1">
-                  <Text variant="caption">Cập nhật lần cuối</Text>
-                  <Text className="font-medium text-neutral-900 mt-0.5">
-                    {department.updatedAt
-                      ? dayjs(
-                          (
-                            department.updatedAt as unknown as {
-                              toDate: () => Date;
-                            }
-                          ).toDate?.() || department.updatedAt,
+                          ).toDate?.() || course.createdAt,
                         ).format("DD/MM/YYYY HH:mm")
                       : "N/A"}
                   </Text>
