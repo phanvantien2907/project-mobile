@@ -14,25 +14,27 @@ import {
 import Toast from "react-native-toast-message";
 import { Building2, X } from "lucide-react-native";
 import { BaseDialogProps } from "@/types/dialog";
+import { useForm, Controller } from "react-hook-form";
+
 
 interface Props extends BaseDialogProps {}
 
-export default function CreateDepartmentComponent({
-  visible,
-  onClose,
-  onSuccess,
-}: Props) {
-  const [name, setName] = useState<string>("");
+type FormData = {
+  name: string;
+};
+
+export default function CreateDepartmentComponent({visible, onClose,onSuccess,}: Props) {
+  const { control, handleSubmit, reset } = useForm<FormData>({ defaultValues: { name: "",  }, });
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible) {
-      setName("");
+      reset();
     }
-  }, [visible]);
+  }, [visible, reset]);
 
-  const handleSubmit = async () => {
-    if (!name.trim()) {
+  const onSubmit = async (data: FormData) => {
+    if (!data.name.trim()) {
       Toast.show({
         type: "error",
         text1: "Lỗi",
@@ -45,7 +47,7 @@ export default function CreateDepartmentComponent({
       setLoading(true);
       await createDepartment({
         id: "",
-        name: name.trim(),
+        name: data.name.trim(),
         createdAt: new Date(),
         updatedAt: new Date(),
         isActive: true,
@@ -94,13 +96,19 @@ export default function CreateDepartmentComponent({
           </View>
 
           <View className="mb-6">
-            <Input
-              placeholder="Nhập tên phòng ban..."
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              variant="outline"
-              icon={Building2}
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Nhập tên phòng ban..."
+                  value={value}
+                  onChangeText={onChange}
+                  autoFocus
+                  variant="outline"
+                  icon={Building2}
+                />
+              )}
             />
           </View>
 
@@ -115,7 +123,7 @@ export default function CreateDepartmentComponent({
               Hủy
             </Button>
             <Button
-              onPress={handleSubmit}
+              onPress={handleSubmit(onSubmit)}
               className="flex-1 bg-brand-500 rounded-full"
               loading={loading}
             >

@@ -14,17 +14,16 @@ import {
 import Toast from "react-native-toast-message";
 import { Building2, X } from "lucide-react-native";
 import { BaseDialogProps } from "@/types/dialog";
+import { useForm, Controller } from "react-hook-form";
 
 interface Props extends BaseDialogProps {
   initialData: IDepartment | null;
 }
-
-export default function UpdateDepartmentComponent({
-  visible,
-  onClose,
-  onSuccess,
-  initialData,
-}: Props) {
+type FormData = {
+  name: string;
+};
+export default function UpdateDepartmentComponent({visible, onClose,onSuccess, initialData,}: Props) {
+   const { control, handleSubmit, reset } = useForm<FormData>({ defaultValues: { name: "",  }, });
   const [name, setName] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -34,8 +33,8 @@ export default function UpdateDepartmentComponent({
     }
   }, [visible, initialData]);
 
-  const handleSubmit = async () => {
-    if (!name.trim()) {
+  const onSubmit = async (data: FormData) => {
+    if (!data.name.trim()) {
       Toast.show({
         type: "error",
         text1: "Lỗi",
@@ -50,7 +49,7 @@ export default function UpdateDepartmentComponent({
       setLoading(true);
       await updateDepartment(initialData.id, {
         ...initialData,
-        name: name.trim(),
+        name: data.name.trim(),
       });
       Toast.show({
         type: "success",
@@ -75,8 +74,7 @@ export default function UpdateDepartmentComponent({
     <Modal visible={visible} transparent animationType="fade">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1 justify-center bg-black/50 p-5"
-      >
+        className="flex-1 justify-center bg-black/50 p-5">
         <Pressable
           className="absolute bottom-0 left-0 right-0 top-0"
           onPress={onClose}
@@ -117,7 +115,7 @@ export default function UpdateDepartmentComponent({
               Hủy
             </Button>
             <Button
-              onPress={handleSubmit}
+              onPress={handleSubmit(onSubmit)}
               className="flex-1 cursor-pointer rounded-full bg-brand-500"
               loading={loading}
             >

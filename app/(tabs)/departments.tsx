@@ -12,7 +12,7 @@ import {
 } from "@/services/departments";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Alert, FlatList, Modal, Pressable, SafeAreaView, View } from "react-native";
+import {FlatList, Modal, Pressable, SafeAreaView, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { Building2, Pencil, Plus, Trash2, MoreVertical, RefreshCcw } from "lucide-react-native";
 import DeleteDepartmentComponent from "@/components/departments/delete";
