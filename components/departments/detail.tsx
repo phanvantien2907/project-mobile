@@ -63,13 +63,14 @@ export default function DetailDepartmentComponent({
                   {department.name}
                 </Text>
                 <View
-                  className={`mt-1.5 self-start px-4 py-1.5 rounded-full ${
+                  className={`mt-1.5 self-start rounded-full ${
                     department.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
                   }`}
+                  style={{ paddingHorizontal: 12, paddingVertical: 4 }}
                 >
                   <Text
-                    style={{ lineHeight: 18, includeFontPadding: true }}
-                    className={`text-xs font-semibold ${
+                    style={{ fontSize: 12, lineHeight: 18, fontWeight: '600' }}
+                    className={`${
                       department.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
                     }`}
                   >

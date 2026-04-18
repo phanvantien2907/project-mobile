@@ -5,6 +5,10 @@ import "../global.css";
 import "../services/firebase";
 import AppToast from "@/components/ui/app-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Appearance } from "react-native";
+
+// Force light mode — app chưa implement dark mode UI
+Appearance.setColorScheme("light");
 
 export default function RootLayout() {
   return (
@@ -15,7 +19,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
         </Stack>
         <AppToast />
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
       </AuthProvider>
     </ThemeProvider>
   );

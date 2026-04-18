@@ -24,14 +24,13 @@ type FormData = {
 };
 export default function UpdateDepartmentComponent({visible, onClose,onSuccess, initialData,}: Props) {
    const { control, handleSubmit, reset } = useForm<FormData>({ defaultValues: { name: "",  }, });
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible && initialData) {
-      setName(initialData.name);
+      reset({ name: initialData.name });
     }
-  }, [visible, initialData]);
+  }, [visible, initialData, reset]);
 
   const onSubmit = async (data: FormData) => {
     if (!data.name.trim()) {
@@ -94,13 +93,19 @@ export default function UpdateDepartmentComponent({visible, onClose,onSuccess, i
           </View>
 
           <View className="mb-6">
-            <Input
-              placeholder="Nhập tên phòng ban..."
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              variant="outline"
-              icon={Building2}
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Nhập tên phòng ban..."
+                  value={value}
+                  onChangeText={onChange}
+                  autoFocus
+                  variant="outline"
+                  icon={Building2}
+                />
+              )}
             />
           </View>
 

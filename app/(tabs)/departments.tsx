@@ -12,12 +12,14 @@ import {
 } from "@/services/departments";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {FlatList, Modal, Pressable, SafeAreaView, View } from "react-native";
+import { FlatList, Modal, Platform, Pressable, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { Building2, Pencil, Plus, Trash2, MoreVertical, RefreshCcw } from "lucide-react-native";
 import DeleteDepartmentComponent from "@/components/departments/delete";
 
 export default function DepartmentsScreen() {
+  const insets = useSafeAreaInsets();
   const [departments, setDepartments] = useState<IDepartment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
@@ -117,13 +119,14 @@ export default function DepartmentsScreen() {
             {item.name}
           </Text>
           <View
-            className={`mt-1.5 self-start px-4 py-1.5 rounded-full ${
+            className={`mt-1.5 self-start rounded-full ${
               item.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
             }`}
+            style={{ paddingHorizontal: 12, paddingVertical: 4 }}
           >
             <Text
-              style={{ lineHeight: 18, includeFontPadding: true }}
-              className={`text-xs font-semibold ${
+              style={{ fontSize: 12, lineHeight: 18, fontWeight: '600' }}
+              className={`${
                 item.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
               }`}
             >
@@ -148,8 +151,8 @@ export default function DepartmentsScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-50">
-      <View className="flex-1 px-5 pt-14 pb-28">
+    <SafeAreaView className="flex-1 bg-brand-50" edges={['top', 'left', 'right']}>
+      <View className="flex-1 px-5 pb-28" style={{ paddingTop: insets.top + 8 }}>
         <View className="mb-6 flex-row items-center justify-between">
           <Text variant="heading" className="text-brand-900">
             Phòng ban
@@ -199,7 +202,11 @@ export default function DepartmentsScreen() {
           className="flex-1 justify-end bg-black/50"
           onPress={() => setActionModalVisible(false)}
         >
-          <Pressable className="rounded-t-3xl bg-white p-6 pb-10" onPress={(e) => e.stopPropagation()}>
+          <Pressable
+            className="rounded-t-3xl bg-white p-6"
+            style={{ paddingBottom: Math.max(insets.bottom + 16, 24) }}
+            onPress={(e) => e.stopPropagation()}
+          >
             <View className="mb-4 items-center">
               <View className="h-1.5 w-12 rounded-full bg-neutral-200" />
             </View>

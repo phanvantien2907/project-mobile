@@ -5,6 +5,7 @@ import { BORDER_RADIUS, CORNERS, FONT_SIZE, HEIGHT } from "@/theme/globals";
 import { LucideProps } from "lucide-react-native";
 import React, { forwardRef, ReactElement, useState } from "react";
 import {
+  Platform,
   Pressable,
   TextInput,
   TextInputProps,
@@ -106,7 +107,7 @@ export const Input = forwardRef<TextInput, InputProps>(
       fontSize: FONT_SIZE,
       lineHeight: isTextarea ? 20 : undefined,
       color: disabled ? muted : error ? danger : textColor,
-      paddingVertical: 0, // Remove default padding
+      paddingVertical: Platform.OS === 'ios' ? 4 : 0,
       textAlignVertical: isTextarea ? "top" : "center",
     });
 

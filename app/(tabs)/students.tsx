@@ -3,10 +3,10 @@ import {
   FlatList,
   Modal,
   Pressable,
-  SafeAreaView,
   View,
   RefreshControl,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import Toast from "react-native-toast-message";
 import {
@@ -29,6 +29,7 @@ import DeleteStudent from "@/components/students/delete";
 import { deleteStudent, restoreStudent, getStudents, IStudent } from "@/services/students";
 
 export default function StudentsScreen() {
+  const insets = useSafeAreaInsets();
   const [students, setStudents] = useState<IStudent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -175,13 +176,14 @@ export default function StudentsScreen() {
              Mã SV: {item.student_code}
           </Text>
           <View
-            className={`mt-1.5 self-start px-4 py-1.5 rounded-full ${
+            className={`mt-1.5 self-start rounded-full ${
               item.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
             }`}
+            style={{ paddingHorizontal: 12, paddingVertical: 4 }}
           >
             <Text
-              style={{ lineHeight: 18, includeFontPadding: true }}
-              className={`text-xs font-semibold ${
+              style={{ fontSize: 12, lineHeight: 18, fontWeight: '600' }}
+              className={`${
                 item.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
               }`}
             >
@@ -206,8 +208,8 @@ export default function StudentsScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-50">
-      <View className="flex-1 px-5 pt-14 pb-28">
+    <SafeAreaView className="flex-1 bg-brand-50" edges={['top', 'left', 'right']}>
+      <View className="flex-1 px-5 pb-28" style={{ paddingTop: insets.top + 8 }}>
         <View className="mb-6 flex-row items-center justify-between">
           <Text variant="heading" className="text-brand-900">
             Sinh viên
@@ -266,7 +268,8 @@ export default function StudentsScreen() {
           onPress={() => setModal("")}
         >
           <Pressable
-            className="rounded-t-3xl bg-white p-6 pb-10"
+            className="rounded-t-3xl bg-white p-6"
+            style={{ paddingBottom: Math.max(insets.bottom + 16, 24) }}
             onPress={(e) => e.stopPropagation()}
           >
             <View className="mb-4 items-center">

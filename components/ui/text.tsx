@@ -41,24 +41,28 @@ export const Text = forwardRef<RNText, TextProps>(
             ...baseStyle,
             fontSize: 28,
             fontWeight: '800',
+            lineHeight: 34,
           };
         case 'title':
           return {
             ...baseStyle,
             fontSize: 24,
             fontWeight: '700',
+            lineHeight: 30,
           };
         case 'subtitle':
           return {
             ...baseStyle,
             fontSize: 19,
             fontWeight: '600',
+            lineHeight: 26,
           };
         case 'caption':
           return {
             ...baseStyle,
             fontSize: FONT_SIZE,
             fontWeight: '400',
+            lineHeight: 22,
             color: mutedColor,
           };
         case 'link':
@@ -66,6 +70,7 @@ export const Text = forwardRef<RNText, TextProps>(
             ...baseStyle,
             fontSize: FONT_SIZE,
             fontWeight: '500',
+            lineHeight: 22,
             textDecorationLine: 'underline',
           };
         default: // 'body'
@@ -73,6 +78,7 @@ export const Text = forwardRef<RNText, TextProps>(
             ...baseStyle,
             fontSize: FONT_SIZE,
             fontWeight: '400',
+            lineHeight: 24,
           };
       }
     };
