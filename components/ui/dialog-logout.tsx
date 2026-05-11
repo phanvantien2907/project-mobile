@@ -24,7 +24,7 @@ export default function DialogLogout({
       <View className="flex-1 items-center justify-center bg-black/50 px-5">
         <View className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lg">
           <Text className="mb-2 text-center text-xl font-bold text-brand-900">
-            Đăng xuất
+            Đăng xuất khỏi hệ thống?
           </Text>
           <Text className="mb-6 text-center text-base text-brand-800/70">
             Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?
