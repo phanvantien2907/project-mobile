@@ -1,4 +1,12 @@
-import { ArrowRight, Building2, ChartColumnBig, ClipboardList, GraduationCap, ReceiptText, School } from "lucide-react-native";
+import {
+  ArrowRight,
+  Building2,
+  ChartColumnBig,
+  ClipboardList,
+  GraduationCap,
+  ReceiptText,
+  School,
+} from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 
 const shortcuts = [
@@ -8,8 +16,8 @@ const shortcuts = [
     icon: GraduationCap,
   },
   {
-    title: "Phòng ban",
-    desc: "Cơ cấu tổ chức & nhân sự phòng ban",
+    title: "Khoa",
+    desc: "Cơ cấu tổ chức & nhân sự Khoa",
     icon: Building2,
   },
   {
@@ -35,43 +43,41 @@ const shortcuts = [
 ];
 
 export default function FastManageComponent() {
-    return (
-         <View className="mb-5 rounded-3xl bg-white p-5">
-          <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-bold text-brand-900">
-              Quản trị nhanh
-            </Text>
-            <Pressable>
-              <Text className="text-sm font-semibold text-brand-500">
-                Xem tất cả
-              </Text>
-            </Pressable>
-          </View>
+  return (
+    <View className="mb-5 rounded-3xl bg-white p-5">
+      <View className="mb-4 flex-row items-center justify-between">
+        <Text className="text-lg font-bold text-brand-900">Quản trị nhanh</Text>
+        <Pressable>
+          <Text className="text-sm font-semibold text-brand-500">
+            Xem tất cả
+          </Text>
+        </Pressable>
+      </View>
 
-          <View className="gap-3">
-            {shortcuts.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Pressable
-                  key={item.title}
-                  className="flex-row items-center gap-3.5 rounded-2xl bg-brand-50 p-3.5 active:opacity-80"
-                >
-                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-brand-500">
-                    <Icon color="#FFFFFF" size={18} />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-bold text-brand-900">
-                      {item.title}
-                    </Text>
-                    <Text className="text-xs leading-4 text-brand-800/60">
-                      {item.desc}
-                    </Text>
-                  </View>
-                  <ArrowRight color="#C9A387" size={16} />
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-    )
+      <View className="gap-3">
+        {shortcuts.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Pressable
+              key={item.title}
+              className="flex-row items-center gap-3.5 rounded-2xl bg-brand-50 p-3.5 active:opacity-80"
+            >
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-brand-500">
+                <Icon color="#FFFFFF" size={18} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-brand-900">
+                  {item.title}
+                </Text>
+                <Text className="text-xs leading-4 text-brand-800/60">
+                  {item.desc}
+                </Text>
+              </View>
+              <ArrowRight color="#C9A387" size={16} />
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
 }

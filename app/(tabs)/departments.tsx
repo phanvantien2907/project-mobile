@@ -1,194 +1,143 @@
-import CreateDepartmentComponent from "@/components/departments/create";
-import DetailDepartmentComponent from "@/components/departments/detail";
-import UpdateDepartmentComponent from "@/components/departments/update";
+import React, { useCallback, useState } from "react";
+import { FlatList, Modal, Pressable, View, RefreshControl } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { router, useFocusEffect } from "expo-router";
+import Toast from "react-native-toast-message";
+import { Building2, Eye, Pencil, Plus, Trash2, MoreVertical, Hash } from "lucide-react-native";
+
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import {
-  deleteDepartment,
-  restoreDepartment,
-  getDepartments,
-  IDepartment,
-} from "@/services/departments";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
-import { FlatList, Modal, Platform, Pressable, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
-import { Building2, Pencil, Plus, Trash2, MoreVertical, RefreshCcw } from "lucide-react-native";
 import DeleteDepartmentComponent from "@/components/departments/delete";
+import { deleteDepartment, getDepartments, IDepartment } from "@/services/departments";
+
+type BottomSheetModal = "" | "action" | "delete";
 
 export default function DepartmentsScreen() {
   const insets = useSafeAreaInsets();
   const [departments, setDepartments] = useState<IDepartment[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
-  const [selectedDept, setSelectedDept] = useState<IDepartment | null>(null);
-  const [deleteModalVisible, setDeleteModalVisible] = useState<boolean>(false);
-  const [restoreModalVisible, setRestoreModalVisible] = useState<boolean>(false);
-  const [deptToDelete, setDeptToDelete] = useState<IDepartment | null>(null);
-  const [actionModalVisible, setActionModalVisible] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [modal, setModal] = useState<BottomSheetModal>("");
+  const [selected, setSelected] = useState<IDepartment | null>(null);
 
   const fetchDepartments = useCallback(async () => {
     try {
-      setLoading(true);
       const data = await getDepartments();
       setDepartments(data);
-    } catch (error) {
-      console.error(error);
-      Toast.show({
-        type: "error",
-        text1: "Lỗi",
-        text2: "Không thể tải danh sách phòng ban",
-      });
+    } catch {
+      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải danh sách Khoa" });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useFocusEffect(
     useCallback(() => {
+      setLoading(true);
       fetchDepartments();
     }, [fetchDepartments]),
   );
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDepartments();
+  }, [fetchDepartments]);
+
   const confirmDelete = async () => {
-    if (!deptToDelete || !deptToDelete.id) return;
+    if (!selected?.id) return;
     try {
-      await deleteDepartment(deptToDelete.id);
-      Toast.show({
-        type: "success",
-        text1: "Thành công",
-        text2: "Đã xóa phòng ban",
-      });
+      await deleteDepartment(selected.id);
+      Toast.show({ type: "success", text1: "Thành công", text2: "Đã xóa Khoa" });
       fetchDepartments();
-    } catch (error) {
-      console.error(error);
-      Toast.show({
-        type: "error",
-        text1: "Lỗi",
-        text2: "Không thể xóa phòng ban",
-      });
+    } catch {
+      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể xóa Khoa" });
     } finally {
-      setDeleteModalVisible(false);
-      setDeptToDelete(null);
+      setModal("");
+      setSelected(null);
     }
   };
 
-  const confirmRestore = async () => {
-    if (!selectedDept || !selectedDept.id) return;
-    try {
-      await restoreDepartment(selectedDept.id);
-      Toast.show({
-        type: "success",
-        text1: "Thành công",
-        text2: "Đã khôi phục phòng ban",
-      });
-      fetchDepartments();
-    } catch (error) {
-      console.error(error);
-      Toast.show({
-        type: "error",
-        text1: "Lỗi",
-        text2: "Không thể khôi phục phòng ban",
-      });
-    } finally {
-      setRestoreModalVisible(false);
-    }
-  };
-
-  const handleDelete = (department: IDepartment) => {
-    setDeptToDelete(department);
-    setDeleteModalVisible(true);
-  };
+  const ACTION_OPTIONS = [
+    {
+      label: "Xem chi tiết", icon: Eye, color: "#18A957", bg: "#E8F8F0",
+      onPress: () => { setModal(""); if (selected?.id) router.push(`/(departments)/departments-detail/${selected.id}`); },
+    },
+    {
+      label: "Chỉnh sửa", icon: Pencil, color: "#2667FF", bg: "#EFF4FF",
+      onPress: () => { setModal(""); if (selected?.id) router.push(`/(departments)/departments-edit/${selected.id}`); },
+    },
+    {
+      label: "Xóa Khoa", icon: Trash2, color: "#E74C3C", bg: "#FFF0EE",
+      onPress: () => { setModal(""); setTimeout(() => setModal("delete"), 150); },
+    },
+  ];
 
   const renderItem = ({ item }: { item: IDepartment }) => (
-    <View className="mb-3 flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm border border-neutral-100">
+    <Pressable
+      onPress={() => router.push(`/(departments)/departments-detail/${item.id}`)}
+      className="mb-3 flex-row items-center justify-between rounded-2xl bg-white p-4 shadow-sm border border-neutral-100"
+      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+    >
       <View className="flex-1 flex-row items-center gap-3">
         <View className="h-10 w-10 items-center justify-center rounded-full bg-brand-50">
           <Icon name={Building2} size={20} color="#F47C20" />
         </View>
         <View className="flex-1">
-          <Text
-            variant="subtitle"
-            className="text-neutral-900 font-semibold"
-            numberOfLines={1}
-          >
+          <Text variant="subtitle" className="text-neutral-900 font-semibold" numberOfLines={1}>
             {item.name}
           </Text>
+          {item.code ? (
+            <View className="flex-row items-center gap-1 mt-0.5">
+              <Icon name={Hash} size={11} color="#A3A3A3" />
+              <Text style={{ fontSize: 11, color: "#A3A3A3", lineHeight: 16 }}>{item.code}</Text>
+            </View>
+          ) : null}
           <View
-            className={`mt-1.5 self-start rounded-full ${
-              item.isActive ? "bg-[#E8F8F0]" : "bg-[#FDECEA]"
-            }`}
-            style={{ paddingHorizontal: 12, paddingVertical: 4 }}
+            style={{ marginTop: 6, alignSelf: "flex-start", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3, backgroundColor: item.isActive ? "#E8F8F0" : "#FDECEA" }}
           >
-            <Text
-              style={{ fontSize: 12, lineHeight: 18, fontWeight: '600' }}
-              className={`${
-                item.isActive ? "text-[#18A957]" : "text-[#E74C3C]"
-              }`}
-            >
+            <Text style={{ fontSize: 11, lineHeight: 16, fontWeight: "600", color: item.isActive ? "#18A957" : "#E74C3C" }}>
               {item.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
             </Text>
           </View>
         </View>
       </View>
-
-      <View className="flex-row items-center gap-2">
-        <Pressable
-          onPress={() => {
-            setSelectedDept(item);
-            setActionModalVisible(true);
-          }}
-          className="h-10 w-10 items-center justify-center rounded-full bg-neutral-100"
-        >
-          <Icon name={MoreVertical} size={20} color="#737373" />
-        </Pressable>
-      </View>
-    </View>
+      <Pressable
+        onPress={(e) => { e.stopPropagation(); setSelected(item); setModal("action"); }}
+        className="h-10 w-10 items-center justify-center rounded-full bg-neutral-100" hitSlop={8}
+      >
+        <Icon name={MoreVertical} size={20} color="#737373" />
+      </Pressable>
+    </Pressable>
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-brand-50" edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-brand-50" edges={["top", "left", "right"]}>
       <View className="flex-1 px-5 pb-28" style={{ paddingTop: insets.top + 8 }}>
         <View className="mb-6 flex-row items-center justify-between">
-          <Text variant="heading" className="text-brand-900">
-            Phòng ban
-          </Text>
-          <Button
-            size="sm"
-            onPress={() => {
-              setCreateModalVisible(true);
-            }}
-            className="rounded-full bg-brand-500"
-            icon={Plus}
-          >
+          <Text variant="heading" className="text-brand-900">Khoa</Text>
+          <Button size="sm" onPress={() => router.push("/(departments)/departments-create")}
+            className="rounded-full bg-brand-500" icon={Plus}>
             Thêm mới
           </Button>
         </View>
-
         <FlatList
           data={departments}
-          keyExtractor={(item, index) => item.id || index.toString()}
+          keyExtractor={(item, i) => item.id || String(i)}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#F47C20"]} />}
           ListEmptyComponent={
             !loading ? (
               <View className="mt-20 items-center justify-center">
                 <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-brand-100">
                   <Icon name={Building2} size={32} color="#F47C20" />
                 </View>
-                <Text variant="title" className="text-center text-neutral-900">
-                  Chưa có phòng ban nào
-                </Text>
-                <Text
-                  variant="caption"
-                  className="mt-2 text-center text-neutral-500"
-                >
-                  Bấm "Thêm mới" để tạo phòng ban đầu tiên
+                <Text variant="title" className="text-center text-neutral-900">Chưa có Khoa nào</Text>
+                <Text variant="caption" className="mt-2 text-center text-neutral-500">
+                  Bấm "Thêm mới" để tạo Khoa đầu tiên
                 </Text>
               </View>
             ) : null
@@ -197,106 +146,39 @@ export default function DepartmentsScreen() {
       </View>
 
       {/* Action Bottom Sheet */}
-      <Modal visible={actionModalVisible} transparent animationType="fade">
-        <Pressable
-          className="flex-1 justify-end bg-black/50"
-          onPress={() => setActionModalVisible(false)}
-        >
-          <Pressable
-            className="rounded-t-3xl bg-white p-6"
+      <Modal visible={modal === "action"} transparent animationType="fade">
+        <Pressable className="flex-1 justify-end bg-black/50" onPress={() => setModal("")}>
+          <Pressable className="rounded-t-3xl bg-white p-6"
             style={{ paddingBottom: Math.max(insets.bottom + 16, 24) }}
-            onPress={(e) => e.stopPropagation()}
-          >
+            onPress={(e) => e.stopPropagation()}>
             <View className="mb-4 items-center">
               <View className="h-1.5 w-12 rounded-full bg-neutral-200" />
             </View>
-            <Text variant="title" className="mb-6 text-center text-brand-900">
-              Tùy chọn thao tác
-            </Text>
-
+            {selected && (
+              <View className="mb-4">
+                <Text variant="caption" className="text-center text-neutral-500">Thao tác với</Text>
+                <Text variant="title" className="text-center text-brand-900" numberOfLines={1}>{selected.name}</Text>
+              </View>
+            )}
             <View className="gap-3">
-              <Pressable
-                onPress={() => {
-                  setActionModalVisible(false);
-                  setTimeout(() => setDetailModalVisible(true), 150);
-                }}
-                className="flex-row items-center gap-3 rounded-2xl bg-[#E8F8F0] p-4"
-              >
-                <Icon name={Building2} size={20} color="#18A957" />
-                <Text className="font-semibold text-[#18A957]">Xem chi tiết</Text>
-              </Pressable>
-
-              {selectedDept?.isActive ? (
-                <>
-                  <Pressable
-                    onPress={() => {
-                      setActionModalVisible(false);
-                      setTimeout(() => setUpdateModalVisible(true), 150);
-                    }}
-                    className="flex-row items-center gap-3 rounded-2xl bg-[#EFF4FF] p-4"
-                  >
-                    <Icon name={Pencil} size={20} color="#2667FF" />
-                    <Text className="font-semibold text-[#2667FF]">Chỉnh sửa</Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={() => {
-                      setActionModalVisible(false);
-                      setTimeout(() => {
-                        if (selectedDept) handleDelete(selectedDept);
-                      }, 150);
-                    }}
-                    className="flex-row items-center gap-3 rounded-2xl bg-[#FFF0EE] p-4"
-                  >
-                    <Icon name={Trash2} size={20} color="#E74C3C" />
-                    <Text className="font-semibold text-[#E74C3C]">Xóa phòng ban</Text>
-                  </Pressable>
-                </>
-              ) : (
-                <Pressable
-                  onPress={() => {
-                    setActionModalVisible(false);
-                    setTimeout(() => setRestoreModalVisible(true), 150);
-                  }}
-                  className="flex-row items-center gap-3 rounded-2xl bg-[#E8F8F0] p-4"
-                >
-                  <Icon name={RefreshCcw} size={20} color="#18A957" />
-                  <Text className="font-semibold text-[#18A957]">Khôi phục phòng ban</Text>
+              {ACTION_OPTIONS.map((action, i) => (
+                <Pressable key={i} onPress={action.onPress}
+                  className="flex-row items-center gap-3 rounded-2xl p-4"
+                  style={{ backgroundColor: action.bg }}>
+                  <Icon name={action.icon} size={20} color={action.color} />
+                  <Text className="font-semibold" style={{ color: action.color }}>{action.label}</Text>
                 </Pressable>
-              )}
+              ))}
             </View>
           </Pressable>
         </Pressable>
       </Modal>
 
-      <CreateDepartmentComponent
-        visible={createModalVisible}
-        onClose={() => setCreateModalVisible(false)}
-        onSuccess={fetchDepartments}
-      />
-      <DetailDepartmentComponent
-        visible={detailModalVisible}
-        onClose={() => setDetailModalVisible(false)}
-        department={selectedDept}
-      />
-      <UpdateDepartmentComponent
-        visible={updateModalVisible}
-        onClose={() => setUpdateModalVisible(false)}
-        onSuccess={fetchDepartments}
-        initialData={selectedDept}
-      />
       <DeleteDepartmentComponent
-        visible={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
+        visible={modal === "delete"}
+        onClose={() => { setModal(""); setSelected(null); }}
         onConfirm={confirmDelete}
-        name={deptToDelete?.name}
-      />
-      <DeleteDepartmentComponent
-        isRestore
-        visible={restoreModalVisible}
-        onClose={() => setRestoreModalVisible(false)}
-        onConfirm={confirmRestore}
-        name={selectedDept?.name}
+        name={selected?.name}
       />
     </SafeAreaView>
   );

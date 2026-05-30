@@ -1,0 +1,166 @@
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import Toast from "react-native-toast-message";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
+
+import { Building2, Hash, AlignLeft, User, Phone, Mail, MapPin, Calendar } from "lucide-react-native";
+
+import { getDepartmentById, updateDepartment, IDepartment } from "@/services/departments";
+
+type FormData = {
+  name: string; code: string; description: string;
+  head_of_department: string; deputy_head: string;
+  established_year: string; email: string; phone: string; location: string;
+};
+
+export default function DepartmentsEditScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  const [initial, setInitial] = useState<IDepartment | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const { control, handleSubmit, reset } = useForm<FormData>({
+    defaultValues: { name: "", code: "", description: "", head_of_department: "", deputy_head: "", established_year: "", email: "", phone: "", location: "" },
+  });
+
+  useEffect(() => {
+    navigation.setOptions({ title: "Chỉnh sửa Khoa" });
+    getDepartmentById(id!)
+      .then((data) => {
+        if (data) {
+          setInitial(data);
+          navigation.setOptions({ title: data.name });
+          reset({
+            name: data.name || "",
+            code: data.code || "",
+            description: data.description || "",
+            head_of_department: data.head_of_department || "",
+            deputy_head: data.deputy_head || "",
+            established_year: data.established_year ? String(data.established_year) : "",
+            email: data.email || "",
+            phone: data.phone || "",
+            location: data.location || "",
+          });
+        }
+      })
+      .catch(() => Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải dữ liệu" }))
+      .finally(() => setLoadingData(false));
+  }, [id]);
+
+  const onSubmit = async (data: FormData) => {
+    if (!initial?.id) return;
+    try {
+      setLoading(true);
+      await updateDepartment(initial.id, {
+        name: data.name,
+        code: data.code.toUpperCase(),
+        description: data.description || undefined,
+        head_of_department: data.head_of_department || undefined,
+        deputy_head: data.deputy_head || undefined,
+        established_year: data.established_year ? parseInt(data.established_year) : undefined,
+        email: data.email || undefined,
+        phone: data.phone || undefined,
+        location: data.location || undefined,
+      });
+      Toast.show({ type: "success", text1: "Thành công", text2: "Cập nhật Khoa thành công" });
+      router.back();
+    } catch {
+      Toast.show({ type: "error", text1: "Lỗi", text2: "Đã có lỗi xảy ra" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loadingData) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF8F2" }}>
+        <ActivityIndicator color="#F47C20" size="large" />
+      </View>
+    );
+  }
+
+  return (
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF8F2" }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: insets.bottom + 32 }}>
+
+        <SectionHeader title="Thông tin cơ bản" />
+        <View style={{ gap: 12, marginBottom: 24 }}>
+          <Controller control={control} name="name" rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <Input placeholder="Tên Khoa *" value={value} onChangeText={onChange}
+                variant="outline" icon={Building2} error={error ? "Vui lòng nhập tên Khoa" : undefined} />
+            )} />
+          <Controller control={control} name="code" rules={{ required: true }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <Input placeholder="Mã Khoa * (VD: CNTT)" value={value} onChangeText={onChange}
+                variant="outline" icon={Hash} autoCapitalize="characters"
+                error={error ? "Vui lòng nhập mã Khoa" : undefined} />
+            )} />
+          <Controller control={control} name="description"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Mô tả ngắn về Khoa (tuỳ chọn)" value={value} onChangeText={onChange}
+                variant="outline" icon={AlignLeft} type="textarea" rows={3} />
+            )} />
+          <Controller control={control} name="established_year"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Năm thành lập" value={value} onChangeText={onChange}
+                variant="outline" icon={Calendar} keyboardType="number-pad" />
+            )} />
+        </View>
+
+        <SectionHeader title="Ban lãnh đạo & Liên hệ" />
+        <View style={{ gap: 12, marginBottom: 32 }}>
+          <Controller control={control} name="head_of_department"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Trưởng Khoa" value={value} onChangeText={onChange} variant="outline" icon={User} />
+            )} />
+          <Controller control={control} name="deputy_head"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Phó Trưởng Khoa" value={value} onChangeText={onChange} variant="outline" icon={User} />
+            )} />
+          <Controller control={control} name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Email văn phòng" value={value} onChangeText={onChange}
+                variant="outline" icon={Mail} keyboardType="email-address" autoCapitalize="none" />
+            )} />
+          <Controller control={control} name="phone"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Số điện thoại văn phòng" value={value} onChangeText={onChange}
+                variant="outline" icon={Phone} keyboardType="phone-pad" />
+            )} />
+          <Controller control={control} name="location"
+            render={({ field: { onChange, value } }) => (
+              <Input placeholder="Địa điểm / Phòng làm việc" value={value} onChangeText={onChange}
+                variant="outline" icon={MapPin} />
+            )} />
+        </View>
+
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          <Button variant="secondary" onPress={() => router.back()} disabled={loading}
+            className="flex-1 rounded-full bg-[#FFEEDD]" textStyle={{ color: "#D96A15" }}>Hủy</Button>
+          <Button onPress={handleSubmit(onSubmit)} loading={loading}
+            className="flex-1 rounded-full bg-brand-500">Lưu thay đổi</Button>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 12 }}>
+      <View style={{ flex: 1, height: 1, backgroundColor: "#F0E0D0" }} />
+      <Text style={{ fontSize: 11, fontWeight: "700", color: "#D96A15", letterSpacing: 1, textTransform: "uppercase" }}>{title}</Text>
+      <View style={{ flex: 1, height: 1, backgroundColor: "#F0E0D0" }} />
+    </View>
+  );
+}

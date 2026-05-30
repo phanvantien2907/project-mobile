@@ -7,7 +7,6 @@ import AppToast from "@/components/ui/app-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Appearance } from "react-native";
 
-// Force light mode — app chưa implement dark mode UI
 Appearance.setColorScheme("light");
 
 export default function RootLayout() {
@@ -17,6 +16,9 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(students)" />
+          <Stack.Screen name="(departments)" />
+          <Stack.Screen name="(courses)" />
         </Stack>
         <AppToast />
         <StatusBar style="dark" />

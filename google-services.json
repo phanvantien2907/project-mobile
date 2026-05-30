@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1058695001832",
+    "project_id": "do-an-mobile-ee6b2",
+    "storage_bucket": "do-an-mobile-ee6b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058695001832:android:689aa0dfed01d54f18fb5d",
+        "android_client_info": {
+          "package_name": "com.dai.hoc.vinh"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058695001832-u9u9ulksp8e96u3cgjntndlbnkd16n9j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dai.hoc.vinh",
+            "certificate_hash": "de0f6efcc3d9ddbbbe50ea47cb7bfbc47246a3cf"
+          }
+        },
+        {
+          "client_id": "1058695001832-4itlighneo7cepts3vrip9obpa5bqves.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlH3Z5R7vl94aXN9zmOKqAdnvRVMqz5mE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058695001832-4itlighneo7cepts3vrip9obpa5bqves.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
