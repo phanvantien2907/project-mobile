@@ -1,11 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
-import {
-  router,
-  useLocalSearchParams,
-  useNavigation,
-  useFocusEffect,
-} from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Pencil,
@@ -15,6 +10,8 @@ import {
   Users,
   Award,
   Building2,
+  Layers,
+  LayoutList,
 } from "lucide-react-native";
 
 import { Text } from "@/components/ui/text";
@@ -34,30 +31,19 @@ export default function CourseDetailScreen() {
   const [course, setCourse] = useState<ICourse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!id) return;
-      setLoading(true);
-      getCourseByID(id)
-        .then((data) => {
-          setCourse(data);
-          if (data) navigation.setOptions({ title: data.course_name });
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }, [id]),
-  );
+  useEffect(() => {
+    const load = async () => {
+      const data = await getCourseByID(id).catch(() => null);
+      setCourse(data);
+      if (data) navigation.setOptions({ title: data.course_name });
+      setLoading(false);
+    };
+    if (id) load();
+  }, [id]);
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFF8F2",
-        }}
-      >
+      <View className="flex-1 items-center justify-center bg-brand-50">
         <ActivityIndicator color="#F47C20" size="large" />
       </View>
     );
@@ -65,14 +51,7 @@ export default function CourseDetailScreen() {
 
   if (!course) {
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#FFF8F2",
-        }}
-      >
+      <View className="flex-1 items-center justify-center bg-brand-50">
         <Text variant="title" style={{ color: "#737373" }}>
           Không tìm thấy môn học
         </Text>
@@ -89,55 +68,19 @@ export default function CourseDetailScreen() {
     label: string,
     value?: string | number | null,
   ) => (
-    <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
-      <View
-        style={{
-          height: 36,
-          width: 36,
-          borderRadius: 18,
-          backgroundColor: "#F5F5F5",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: 2,
-        }}
-      >
+    <View className="flex-row items-start gap-3">
+      <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-full bg-neutral-100">
         <Icon name={IconComp} size={16} color="#737373" />
       </View>
-      <View style={{ flex: 1 }}>
-        <Text variant="caption" style={{ color: "#A3A3A3" }}>
-          {label}
-        </Text>
+      <View className="flex-1">
+        <Text variant="caption" style={{ color: "#A3A3A3" }}>{label}</Text>
         {value != null && String(value).trim() !== "" ? (
-          <Text
-            style={{
-              fontSize: 15,
-              fontWeight: "500",
-              color: "#1F1A17",
-              marginTop: 2,
-              lineHeight: 22,
-            }}
-          >
+          <Text style={{ fontSize: 15, fontWeight: "500", color: "#1F1A17", marginTop: 2, lineHeight: 22 }}>
             {String(value)}
           </Text>
         ) : (
-          <View
-            style={{
-              alignSelf: "flex-start",
-              marginTop: 4,
-              paddingHorizontal: 10,
-              paddingVertical: 2,
-              backgroundColor: "#FDECEA",
-              borderRadius: 999,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 11,
-                fontWeight: "600",
-                color: "#E74C3C",
-                lineHeight: 18,
-              }}
-            >
+          <View className="mt-1 self-start rounded-full bg-red-50 px-2.5 py-0.5">
+            <Text style={{ fontSize: 11, fontWeight: "600", color: "#E74C3C", lineHeight: 18 }}>
               Chưa cập nhật
             </Text>
           </View>
@@ -148,108 +91,47 @@ export default function CourseDetailScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: "#FFF8F2" }}
+      className="flex-1 bg-brand-50"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 40 }}
     >
       {/* Hero Card */}
-      <View style={cardStyle}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 16,
-            marginBottom: 12,
-          }}
-        >
-          <View
-            style={{
-              height: 64,
-              width: 64,
-              borderRadius: 32,
-              backgroundColor: "#FFF3E8",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+      <View className="mb-4 rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm elevation-2">
+        <View className="mb-3 flex-row items-center gap-4">
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-50">
             <Icon name={BookOpen} size={28} color="#F47C20" />
           </View>
-          <View style={{ flex: 1 }}>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "700",
-                color: "#1F1A17",
-                lineHeight: 26,
-              }}
-            >
+          <View className="flex-1">
+            <Text className="text-[18px] font-bold leading-[26px] text-neutral-900">
               {course.course_name}
             </Text>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                flexWrap: "wrap",
-                marginTop: 4,
-              }}
-            >
+            <View className="mt-1 flex-row flex-wrap items-center gap-1.5">
               {/* Mã môn */}
-              <View
-                style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 3,
-                  backgroundColor: "#FFF3E8",
-                  borderRadius: 999,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "700",
-                    color: "#F47C20",
-                    lineHeight: 18,
-                  }}
-                >
+              <View className="rounded-full bg-brand-50 px-2.5 py-0.5">
+                <Text className="text-[12px] font-bold leading-[18px] text-brand-500">
                   {course.course_code}
                 </Text>
               </View>
               {/* Loại môn */}
               <View
-                style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 3,
-                  backgroundColor: typeConfig.bg,
-                  borderRadius: 999,
-                }}
+                className="rounded-full px-2.5 py-0.5"
+                style={{ backgroundColor: typeConfig.bg }}
               >
                 <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: typeConfig.text,
-                    lineHeight: 18,
-                  }}
+                  className="text-[12px] font-semibold leading-[18px]"
+                  style={{ color: typeConfig.text }}
                 >
                   {typeConfig.label}
                 </Text>
               </View>
               {/* Status */}
               <View
-                style={{
-                  paddingHorizontal: 10,
-                  paddingVertical: 3,
-                  backgroundColor: course.isActive ? "#E8F8F0" : "#FDECEA",
-                  borderRadius: 999,
-                }}
+                className="rounded-full px-2.5 py-0.5"
+                style={{ backgroundColor: course.isActive ? "#E8F8F0" : "#FDECEA" }}
               >
                 <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: course.isActive ? "#18A957" : "#E74C3C",
-                    lineHeight: 18,
-                  }}
+                  className="text-[12px] font-semibold leading-[18px]"
+                  style={{ color: course.isActive ? "#18A957" : "#E74C3C" }}
                 >
                   {course.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
                 </Text>
@@ -259,58 +141,21 @@ export default function CourseDetailScreen() {
         </View>
 
         {/* Tín chỉ highlight */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 12,
-            backgroundColor: "#FFF8E0",
-            borderRadius: 14,
-            padding: 14,
-          }}
-        >
+        <View className="flex-row items-center gap-3 rounded-xl bg-[#FFF8E0] p-3.5">
           <Icon name={Award} size={20} color="#F0A500" />
           <View>
-            <Text style={{ fontSize: 12, color: "#A38050", lineHeight: 18 }}>
-              Số tín chỉ
-            </Text>
-            <Text
-              style={{
-                fontSize: 22,
-                fontWeight: "800",
-                color: "#F0A500",
-                lineHeight: 30,
-              }}
-            >
+            <Text className="text-[12px] leading-[18px] text-[#A38050]">Số tín chỉ</Text>
+            <Text className="text-[22px] font-extrabold leading-[30px] text-[#F0A500]">
               {course.course_credits}
-              <Text
-                style={{ fontSize: 14, fontWeight: "400", color: "#A38050" }}
-              >
-                {" "}
-                tín chỉ
-              </Text>
+              <Text className="text-sm font-normal text-[#A38050]"> tín chỉ</Text>
             </Text>
           </View>
         </View>
 
         {/* Mô tả */}
         {course.description ? (
-          <View
-            style={{
-              marginTop: 12,
-              backgroundColor: "#FFF8F2",
-              borderRadius: 12,
-              padding: 12,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 14,
-                color: "#737373",
-                lineHeight: 22,
-                fontStyle: "italic",
-              }}
-            >
+          <View className="mt-3 rounded-xl bg-brand-50 p-3">
+            <Text className="text-sm italic leading-[22px] text-neutral-500">
               {course.description}
             </Text>
           </View>
@@ -320,18 +165,16 @@ export default function CourseDetailScreen() {
       {/* Thông tin môn học */}
       <InfoCard title="Thông tin môn học">
         {renderRow(Building2, "Khoa / Ngành", course.department_name)}
-        {renderRow(
-          BookOpen,
-          "Loại môn",
-          getCourseTypeLabel(course.course_type),
-        )}
+        {renderRow(BookOpen, "Loại môn", getCourseTypeLabel(course.course_type))}
       </InfoCard>
 
       {/* Kế hoạch giảng dạy */}
       <InfoCard title="Kế hoạch giảng dạy">
-        {renderRow(User, "Giảng viên", course.lecturer)}
-        {renderRow(Calendar, "Học kỳ", course.semester)}
-        {renderRow(Users, "Sĩ số tối đa", course.max_students)}
+        {renderRow(User,         "Giảng viên",      course.lecturer)}
+        {renderRow(Calendar,     "Học kỳ",        course.semester)}
+        {renderRow(Layers,       "Phân kỳ",        course.semester_period ? `Kỳ ${course.semester_period}` : undefined)}
+        {renderRow(LayoutList,   "Phân tiết",     course.lesson_distribution)}
+        {renderRow(Users,        "Sĩ số tối đa",   course.max_students)}
       </InfoCard>
 
       <Button
@@ -345,20 +188,6 @@ export default function CourseDetailScreen() {
   );
 }
 
-const cardStyle = {
-  backgroundColor: "#FFFFFF",
-  borderRadius: 20,
-  padding: 20,
-  marginBottom: 16,
-  borderWidth: 1,
-  borderColor: "#F0F0F0",
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.05,
-  shadowRadius: 8,
-  elevation: 2,
-};
-
 function InfoCard({
   title,
   children,
@@ -367,19 +196,8 @@ function InfoCard({
   children: React.ReactNode;
 }) {
   return (
-    <View style={{ ...cardStyle, gap: 16 }}>
-      <Text
-        style={{
-          fontSize: 11,
-          fontWeight: "700",
-          color: "#D96A15",
-          letterSpacing: 1,
-          textTransform: "uppercase",
-          borderBottomWidth: 1,
-          borderColor: "#FFF0E5",
-          paddingBottom: 10,
-        }}
-      >
+    <View className="mb-4 gap-4 rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm elevation-2">
+      <Text style={{ fontSize: 11, fontWeight: "700", color: "#D96A15", letterSpacing: 1, textTransform: "uppercase", borderBottomWidth: 1, borderColor: "#FFF0E5", paddingBottom: 10 }}>
         {title}
       </Text>
       {children}

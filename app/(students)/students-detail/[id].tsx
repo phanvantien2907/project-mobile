@@ -1,12 +1,19 @@
-import React, { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  View,
-} from "react-native";
-import { router, useLocalSearchParams, useNavigation, useFocusEffect } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Pencil, GraduationCap, Mail, Phone, MapPin, Users, BookMarked, Building2, Star, Calendar } from "lucide-react-native";
+import {
+  Pencil,
+  GraduationCap,
+  Mail,
+  Phone,
+  MapPin,
+  Users,
+  BookMarked,
+  Building2,
+  Star,
+  Calendar,
+} from "lucide-react-native";
 
 import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
@@ -33,24 +40,20 @@ export default function StudentDetailScreen() {
   const [student, setStudent] = useState<IStudent | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!id) return;
-      setLoading(true);
-      getStudentByID(id)
-        .then((results) => {
-          const found = results[0] ?? null;
-          setStudent(found);
-          if (found) navigation.setOptions({ title: found.student_name });
-        })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }, [id]),
-  );
+  useEffect(() => {
+    const load = async () => {
+      const results = await getStudentByID(id).catch(() => []);
+      const found = results[0] ?? null;
+      setStudent(found);
+      if (found) navigation.setOptions({ title: found.student_name });
+      setLoading(false);
+    };
+    if (id) load();
+  }, [id]);
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF8F2" }}>
+      <View className="flex-1 items-center justify-center bg-brand-50">
         <ActivityIndicator color="#F47C20" size="large" />
       </View>
     );
@@ -58,8 +61,10 @@ export default function StudentDetailScreen() {
 
   if (!student) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#FFF8F2" }}>
-        <Text variant="title" style={{ color: "#737373" }}>Không tìm thấy sinh viên</Text>
+      <View className="flex-1 items-center justify-center bg-brand-50">
+        <Text variant="title" style={{ color: "#737373" }}>
+          Không tìm thấy sinh viên
+        </Text>
       </View>
     );
   }
@@ -72,37 +77,18 @@ export default function StudentDetailScreen() {
     label: string,
     value?: string | number | null,
   ) => (
-    <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 12 }}>
-      <View
-        style={{
-          height: 36,
-          width: 36,
-          borderRadius: 18,
-          backgroundColor: "#F5F5F5",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: 2,
-        }}
-      >
+    <View className="flex-row items-start gap-3">
+      <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-full bg-neutral-100">
         <Icon name={IconComp} size={16} color="#737373" />
       </View>
-      <View style={{ flex: 1 }}>
+      <View className="flex-1">
         <Text variant="caption" style={{ color: "#A3A3A3" }}>{label}</Text>
         {value != null && String(value).trim() !== "" ? (
           <Text style={{ fontSize: 15, fontWeight: "500", color: "#1F1A17", marginTop: 2, lineHeight: 22 }}>
             {String(value)}
           </Text>
         ) : (
-          <View
-            style={{
-              alignSelf: "flex-start",
-              marginTop: 4,
-              paddingHorizontal: 10,
-              paddingVertical: 2,
-              backgroundColor: "#FDECEA",
-              borderRadius: 999,
-            }}
-          >
+          <View className="mt-1 self-start rounded-full bg-red-50 px-2.5 py-0.5">
             <Text style={{ fontSize: 11, fontWeight: "600", color: "#E74C3C", lineHeight: 18 }}>
               Chưa cập nhật
             </Text>
@@ -114,61 +100,36 @@ export default function StudentDetailScreen() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: "#FFF8F2" }}
+      className="flex-1 bg-brand-50"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        padding: 20,
-        paddingBottom: insets.bottom + 40,
-      }}
+      contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 40 }}
     >
       {/* Hero Card */}
-      <View
-        style={{
-          backgroundColor: "#FFFFFF",
-          borderRadius: 20,
-          padding: 20,
-          marginBottom: 16,
-          borderWidth: 1,
-          borderColor: "#F0F0F0",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 8,
-          elevation: 2,
-        }}
-      >
+      <View className="mb-4 rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm elevation-2">
         {/* Avatar + Name */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 16, marginBottom: 16 }}>
-          <View
-            style={{
-              height: 64,
-              width: 64,
-              borderRadius: 32,
-              backgroundColor: "#FFF3E8",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Icon name={GraduationCap} size={28} color="#F47C20" />
+        <View className="mb-4 flex-row items-center gap-4">
+          {/* Avatar circle với initials */}
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-brand-50">
+            <Text style={{ fontSize: 22, fontWeight: "800", color: "#F47C20" }}>
+              {student.student_name?.charAt(0)?.toUpperCase() ?? "S"}
+            </Text>
           </View>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <Text style={{ fontSize: 18, fontWeight: "700", color: "#1F1A17", lineHeight: 26 }}>
               {student.student_name}
             </Text>
-            <Text style={{ fontSize: 13, color: "#737373", marginTop: 2, lineHeight: 20 }}>
-              Mã SV: {student.student_code}
-            </Text>
+            {/* Mã sinh viên badge */}
+            <View className="mt-1 flex-row items-center gap-1.5 self-start rounded-full bg-brand-50 px-2.5 py-0.5">
+              <Text style={{ fontSize: 12, fontWeight: "700", color: "#F47C20", letterSpacing: 0.5 }}>
+                {student.student_code}
+              </Text>
+            </View>
+            {/* Status badge */}
             <View
-              style={{
-                alignSelf: "flex-start",
-                marginTop: 6,
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                backgroundColor: statusConfig.bg,
-                borderRadius: 999,
-              }}
+              className="mt-1.5 self-start rounded-full px-3 py-0.5"
+              style={{ backgroundColor: statusConfig.bg }}
             >
-              <Text style={{ fontSize: 12, fontWeight: "700", color: statusConfig.text, lineHeight: 18 }}>
+              <Text style={{ fontSize: 12, fontWeight: "600", color: statusConfig.text }}>
                 {statusConfig.label}
               </Text>
             </View>
@@ -177,16 +138,7 @@ export default function StudentDetailScreen() {
 
         {/* GPA Highlight */}
         {student.gpa != null && (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 12,
-              backgroundColor: "#FFF8E0",
-              borderRadius: 14,
-              padding: 14,
-            }}
-          >
+          <View className="flex-row items-center gap-3 rounded-xl bg-[#FFF8E0] p-3.5">
             <Icon name={Star} size={20} color="#F0A500" />
             <View>
               <Text style={{ fontSize: 12, color: "#A38050", lineHeight: 18 }}>GPA tích lũy</Text>
@@ -199,24 +151,23 @@ export default function StudentDetailScreen() {
         )}
       </View>
 
-      {/* Thông tin cơ bản Card */}
+      {/* Thông tin cơ bản */}
       <InfoCard title="Thông tin cơ bản">
-        {renderRow(Mail,    "Email",         student.student_email)}
-        {renderRow(Phone,   "Số điện thoại", student.student_phone)}
-        {renderRow(Users,   "Giới tính",     getGenderLabel(student.gender))}
-        {renderRow(Calendar,"Ngày sinh",     student.date_of_birth)}
-        {renderRow(MapPin,  "Địa chỉ",       student.address)}
+        {renderRow(Mail,    "Email",          student.student_email)}
+        {renderRow(Phone,   "Số điện thoại",  student.student_phone)}
+        {renderRow(Users,   "Giới tính",      getGenderLabel(student.gender))}
+        {renderRow(Calendar,"Ngày sinh",      student.date_of_birth)}
+        {renderRow(MapPin,  "Địa chỉ",        student.address)}
       </InfoCard>
 
-      {/* Thông tin học vụ Card */}
+      {/* Thông tin học vụ */}
       <InfoCard title="Thông tin học vụ">
-        {renderRow(Building2,    "Khoa / Ngành",     student.department_name)}
-        {renderRow(Calendar,     "Niên khóa",        student.academic_year)}
-        {renderRow(BookMarked,   "Tên lớp",          student.class_name)}
+        {renderRow(Building2,    "Khoa / Ngành",      student.department_name)}
+        {renderRow(Calendar,     "Niên khóa",         student.academic_year)}
+        {renderRow(BookMarked,   "Tên lớp",           student.class_name)}
         {renderRow(GraduationCap,"Tình trạng học vụ", getAcademicStatusLabel(student.academic_status))}
       </InfoCard>
 
-      {/* Edit Button */}
       <Button
         className="rounded-full bg-brand-500"
         icon={Pencil}
@@ -230,34 +181,8 @@ export default function StudentDetailScreen() {
 
 function InfoCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 16,
-        borderWidth: 1,
-        borderColor: "#F0F0F0",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
-        gap: 16,
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 11,
-          fontWeight: "700",
-          color: "#D96A15",
-          letterSpacing: 1,
-          textTransform: "uppercase",
-          borderBottomWidth: 1,
-          borderColor: "#FFF0E5",
-          paddingBottom: 10,
-        }}
-      >
+    <View className="mb-4 gap-4 rounded-2xl border border-neutral-100 bg-white p-5 shadow-sm elevation-2">
+      <Text style={{ fontSize: 11, fontWeight: "700", color: "#D96A15", letterSpacing: 1, textTransform: "uppercase", borderBottomWidth: 1, borderColor: "#FFF0E5", paddingBottom: 10 }}>
         {title}
       </Text>
       {children}

@@ -1,7 +1,9 @@
 import { db } from "@/services/firebase";
 import {
   collection,
+  deleteDoc,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -12,19 +14,18 @@ import {
 
 export interface IDepartment {
   id: string;
-  name: string; // Tên khoa (e.g. "Khoa Công nghệ Thông tin")
-  code: string; // Mã khoa  (e.g. "CNTT")
-  description?: string; // Mô tả ngắn
-  head_of_department?: string; // Trưởng khoa
-  deputy_head?: string; // Phó trưởng khoa
-  established_year?: number; // Năm thành lập (e.g. 1995)
-  email?: string; // Email liên hệ khoa
-  phone?: string; // Số điện thoại văn phòng
-  location?: string; // Địa điểm / phòng làm việc (e.g. "Tòa A, Tầng 3")
+  name: string;
+  code: string;
+  description?: string;
+  head_of_department?: string;
+  deputy_head?: string;
+  established_year?: number;
+  email?: string;
+  phone?: string;
+  location?: string;
   isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  deletedAt?: Date | null;
 }
 
 export async function createDepartment(data: Omit<IDepartment, "id">) {
@@ -35,7 +36,6 @@ export async function createDepartment(data: Omit<IDepartment, "id">) {
     createdAt: Timestamp.now(),
     updatedAt: Timestamp.now(),
     isActive: true,
-    deletedAt: null,
   });
   return docref;
 }
@@ -47,10 +47,8 @@ export async function getDepartments() {
 }
 
 export async function getDepartmentById(id: string) {
-  const q = query(collection(db, "departments"), orderBy("createdAt", "desc"));
-  const snapshot = await getDocs(q);
-  const found = snapshot.docs.find((d) => d.id === id);
-  return found ? ({ ...found.data(), id: found.id } as IDepartment) : null;
+  const snap = await getDoc(doc(db, "departments", id));
+  return snap.exists() ? ({ ...snap.data(), id: snap.id } as IDepartment) : null;
 }
 
 export async function updateDepartment(id: string, data: Partial<IDepartment>) {
@@ -61,8 +59,5 @@ export async function updateDepartment(id: string, data: Partial<IDepartment>) {
 }
 
 export async function deleteDepartment(id: string) {
-  return await updateDoc(doc(db, "departments", id), {
-    deletedAt: Timestamp.now(),
-    isActive: false,
-  });
+  return await deleteDoc(doc(db, "departments", id));
 }

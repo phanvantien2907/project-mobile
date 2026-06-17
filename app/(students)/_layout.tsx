@@ -18,15 +18,7 @@ export default function StudentsLayout() {
         headerLeft: () => (
           <Pressable
             onPress={() => router.back()}
-            style={{
-              height: 36,
-              width: 36,
-              borderRadius: 18,
-              backgroundColor: "#FFEEDD",
-              alignItems: "center",
-              justifyContent: "center",
-              marginLeft: 4,
-            }}
+            className="ml-1 h-9 w-9 items-center justify-center rounded-full bg-[#FFEEDD]"
           >
             <ArrowLeft size={18} color="#D96A15" />
           </Pressable>

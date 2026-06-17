@@ -1,19 +1,23 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { auth, db } from "./firebase";
-import { doc, setDoc, updateDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 export async function register(email: string, password: string) {
   try {
-    const createUser = await createUserWithEmailAndPassword(auth, email, password);
+    const createUser = await createUserWithEmailAndPassword( auth, email, password, );
     const savedUser = await setDoc(doc(db, "users", createUser.user.uid), {
       user_id: createUser.user.uid,
       user_email: createUser.user.email,
       user_createdAt: Timestamp.now(),
       user_updatedAt: Timestamp.now(),
-      user_role: 'staff',
+      user_role: "staff",
       user_is_active: true,
       user_lastLoginAt: null,
-      user_deletedAt: null
+      user_deletedAt: null,
     });
     return savedUser;
   } catch (error) {
@@ -44,4 +48,3 @@ export async function logout() {
     throw error;
   }
 }
-

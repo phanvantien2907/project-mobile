@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Modal,
@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import {
   Plus,
@@ -49,7 +49,7 @@ export default function StudentsScreen() {
   const [modal, setModal] = useState<BottomSheetModal>("");
   const [selected, setSelected] = useState<IStudent | null>(null);
 
-  const fetchStudents = useCallback(async () => {
+  const fetchStudents = async () => {
     try {
       const data = await getStudents();
       setStudents(data);
@@ -62,22 +62,28 @@ export default function StudentsScreen() {
       });
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
+  };
+
+  useEffect(() => {
+    fetchStudents();
   }, []);
 
-  // Refresh list khi quay lại từ create/edit screen
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      fetchStudents();
-    }, [fetchStudents]),
-  );
-
-  const onRefresh = useCallback(() => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchStudents();
-  }, [fetchStudents]);
+    try {
+      const data = await getStudents();
+      setStudents(data);
+    } catch {
+      Toast.show({
+        type: "error",
+        text1: "Lỗi",
+        text2: "Không thể tải danh sách sinh viên",
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!selected?.id) return;

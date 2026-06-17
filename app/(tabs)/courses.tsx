@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Modal, Pressable, View, RefreshControl } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import Toast from "react-native-toast-message";
 import { BookOpen, Eye, Pencil, Plus, Trash2, MoreVertical, Award, Building2 } from "lucide-react-native";
 
@@ -21,7 +21,7 @@ export default function CoursesScreen() {
   const [modal, setModal] = useState<BottomSheetModal>("");
   const [selected, setSelected] = useState<ICourse | null>(null);
 
-  const fetchCourses = useCallback(async () => {
+  const fetchCourses = async () => {
     try {
       const data = await getCourses();
       setCourses(data);
@@ -29,21 +29,24 @@ export default function CoursesScreen() {
       Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải danh sách môn học" });
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
+  };
+
+  useEffect(() => {
+    fetchCourses();
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      fetchCourses();
-    }, [fetchCourses]),
-  );
-
-  const onRefresh = useCallback(() => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    fetchCourses();
-  }, [fetchCourses]);
+    try {
+      const data = await getCourses();
+      setCourses(data);
+    } catch {
+      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải danh sách môn học" });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const confirmDelete = async () => {
     if (!selected?.id) return;

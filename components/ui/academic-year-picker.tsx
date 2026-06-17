@@ -84,9 +84,20 @@ export function AcademicYearPicker({
 
   const displayLabel = value || null;
   const previewLabel = `${selectedStart} - ${selectedEnd}`;
+  const selectedValue = `${selectedStart}-${selectedEnd}`;
 
   // warn if end < start
   const isInvalid = selectedEnd < selectedStart;
+
+  const handleSelectStartYear = (year: number) => {
+    setSelectedStart(year);
+    setSelectedEnd(year + 4);
+  };
+
+  const handleSelectEndYear = (year: number) => {
+    setSelectedEnd(year);
+    setSelectedStart(year - 4);
+  };
 
   const openPicker = () => {
     if (disabled) return;
@@ -98,7 +109,7 @@ export function AcademicYearPicker({
 
   const handleConfirm = () => {
     if (isInvalid) return;
-    onChange(previewLabel);
+    onChange(selectedValue);
     setOpen(false);
   };
 
@@ -229,7 +240,7 @@ export function AcademicYearPicker({
                   label="NĂM VÀO"
                   years={START_YEARS}
                   selected={selectedStart}
-                  onSelect={setSelectedStart}
+                  onSelect={handleSelectStartYear}
                   primary={primary}
                   textColor={textColor}
                   borderColor={borderColor}
@@ -241,7 +252,7 @@ export function AcademicYearPicker({
                   label="NĂM RA"
                   years={END_YEARS}
                   selected={selectedEnd}
-                  onSelect={setSelectedEnd}
+                  onSelect={handleSelectEndYear}
                   primary={isInvalid ? danger : primary}
                   textColor={textColor}
                   borderColor={isInvalid ? danger + "60" : borderColor}
